@@ -86,7 +86,8 @@ FROM AnonSpotifyHistory
 GROUP BY time_of_day
 ORDER BY plays DESC;
 
--- Step 1: Get first listen per artist
+##How often do they explore new artists vs replaying favorites?
+
 WITH FirstListens AS (
     SELECT 
         artist_name,
@@ -95,7 +96,6 @@ WITH FirstListens AS (
     GROUP BY artist_name
 ),
 
--- Step 2: Get top 20 artists by total play count
 TopArtists AS (
     SELECT 
         artist_name,
@@ -106,7 +106,6 @@ TopArtists AS (
     LIMIT 20
 ),
 
--- Step 3: Join play data with first listens
 AllPlays AS (
     SELECT 
         a.artist_name,
@@ -115,8 +114,7 @@ AllPlays AS (
     FROM AnonSpotifyHistory a
     JOIN FirstListens f ON a.artist_name = f.artist_name
 ),
-
--- Step 4: Classify each play
+	
 ClassifiedPlays AS (
     SELECT
         p.artist_name,
@@ -131,7 +129,6 @@ ClassifiedPlays AS (
     LEFT JOIN TopArtists t ON p.artist_name = t.artist_name
 ),
 
--- Step 5: Count plays by category
 Counts AS (
     SELECT
         artist_type,
@@ -141,13 +138,11 @@ Counts AS (
     GROUP BY artist_type
 ),
 
--- Step 6: Get total play count for relevant categories
 Total AS (
     SELECT SUM(play_count) AS total_plays
     FROM Counts
 )
 
--- Final Output: Add percentages
 SELECT
     c.artist_type,
     c.play_count,
